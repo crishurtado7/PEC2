@@ -1,0 +1,21 @@
+﻿public enum Tiles
+{
+    Unset,
+    Block2,
+    BreakingBlock,
+    Cloud1,
+    Cloud2,
+    Cloud3,
+    Cloud4,
+    Cloud5,
+    Cloud6,
+    Floor1,
+    Goal1,
+    Goal2,
+    ItemBlock,
+    Pipeline1,
+    Pipeline2,
+    Pipeline3,
+    Pipeline4,
+    UsedBlock
+}

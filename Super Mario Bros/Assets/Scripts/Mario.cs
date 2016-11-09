@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 public class Mario : MonoBehaviour
 {
@@ -14,7 +13,7 @@ public class Mario : MonoBehaviour
     public Transform groundCheck;
     float groundRadius = 0.2f;
     public LayerMask whatIsGround;
-    public float jumpForce = 500f;
+    public float jumpForce = 10f;
 
 	// Use this for initialization
 	void Start ()
@@ -58,7 +57,7 @@ public class Mario : MonoBehaviour
         if (grounded && Input.GetKeyDown(KeyCode.Space))
         {
             marioAnimator.SetBool("Ground", false);
-            rigidbody2D.AddForce(new Vector2(0, jumpForce));
+            rigidbody2D.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
     }
 
@@ -68,5 +67,32 @@ public class Mario : MonoBehaviour
         Vector3 theScale = transform.localScale;
         theScale.x *= -1;
         transform.localScale = theScale;
+    }
+
+    void OnCollisionEnter2D(Collision2D other)
+    {
+        if(other.gameObject.tag == "BreakingBlock")
+        {
+            Destroy(other.gameObject);
+        }       
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.tag == "Exit")
+        {
+            //Invoke("Restart", restartLevelDelay);
+            //enabled = false;
+        }
+        else if (other.tag == "SuperMushroom")
+        {
+            //food += pointsPerFood;
+            //other.gameObject.SetActive(false);
+        }
+        //else if (other.tag == "Soda")
+        //{
+        //    food += pointsPerSoda;
+        //    other.gameObject.SetActive(false);
+        //}
     }
 }

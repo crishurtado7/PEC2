@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 public class BoardManager : MonoBehaviour
 {
-    private int columns = 215;
-    private int rows = 15;
+    private int _columns = 215;
+    private int _rows = 15;
 
-    private int[,] TileMap = new int[,] {
+    private int[,] _tileMap = new int[,] {
         {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,4,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,3,4,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,4,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,3,4,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,4,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,3,4,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
 {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,5,6,7,-1,-1,-1,-1,-1,2,3,3,3,4,-1,-1,-1,-1,5,6,6,7,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,4,-1,-1,-1,-1,-1,-1,-1,-1,5,6,7,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,3,4,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,2,3,4,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,5,6,6,7,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,5,6,7,-1,-1,-1,-1,-1,2,3,3,3,4,-1,-1,-1,-1,5,6,6,7,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,9,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
@@ -26,19 +27,20 @@ public class BoardManager : MonoBehaviour
    };
 
     public TilePrefab[] Tiles;
+    public GameObject Enemy;
 
-    private Transform boardHolder;
-    private List<Vector3> gridPositions = new List<Vector3>();
+    private Transform _boardHolder;
+    private List<Vector3> _gridPositions = new List<Vector3>();
 
     void InitializeList()
     {
-        gridPositions.Clear();
+        _gridPositions.Clear();
 
-        for (int x = 1; x < columns - 1; x++)
+        for (var x = 1; x < _columns - 1; x++)
         {
-            for (int y = 1; y < rows - 1; y++)
+            for (var y = 1; y < _rows - 1; y++)
             {
-                gridPositions.Add(new Vector3(x, y, 0f));
+                _gridPositions.Add(new Vector3(x, y, 0f));
             }
         }
     }
@@ -47,22 +49,21 @@ public class BoardManager : MonoBehaviour
     {
         try
         {
-            boardHolder = new GameObject("Board").transform;
+            _boardHolder = new GameObject("Board").transform;
 
-            for (int x = 0; x < columns; x++)
+            for (var x = 0; x < _columns; x++)
             {
-                for (int y = 0; y < rows; y++)
+                for (var y = 0; y < _rows; y++)
                 {
-                    int tileId = TileMap[y, x];
+                    var tileId = _tileMap[y, x];
 
-                    GameObject toInstantiate;
                     if (tileId >= 0 && tileId < Tiles.Length)
                     {
-                        toInstantiate = Tiles[tileId].Tile;
+                        var toInstantiate = Tiles[tileId].Tile;
 
                         GameObject instance = Instantiate(toInstantiate, new Vector3(x, -y, 0f), Quaternion.identity) as GameObject;
 
-                        instance.transform.SetParent(boardHolder);
+                        instance.transform.SetParent(_boardHolder);
                     }
                 }
             }
@@ -74,9 +75,31 @@ public class BoardManager : MonoBehaviour
 
     }
 
+    void SetupEnemies()
+    {
+        var enemiesPositions = new List<Vector3>
+        {
+            new Vector3(21, -12, 0),
+            new Vector3(40, -12, 0),
+            new Vector3(53, -12, 0),
+            new Vector3(54, -12, 0),
+            new Vector3(84, -5, 0),
+            new Vector3(82, -8, 0),
+            new Vector3(101, -12, 0),
+            new Vector3(132, -12, 0),
+            new Vector3(174, -12, 0),
+            new Vector3(175, -12, 0)
+        };
+        for (var i = 0; i < enemiesPositions.Count; i++)
+        {
+            Instantiate(Enemy, enemiesPositions.ElementAt(i), Quaternion.identity);
+        }
+    }
+
     public void SetupScene(int level)
     {
         BoardSetup();
+        SetupEnemies();
         InitializeList();
     }
 }

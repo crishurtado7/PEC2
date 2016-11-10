@@ -2,51 +2,47 @@
 
 public class Mario : MonoBehaviour
 {
-    public float maxSpeed = 10f;
+    public float MaxSpeed = 7f;
+    public Transform GroundCheck;
+    public LayerMask WhatIsGround;
+    public float JumpForce = 10f;
 
-    private Animator marioAnimator;
-    private Rigidbody2D rigidbody2D;
-    private int coins;
-    bool facingRight = true;
+    private Animator _marioAnimator;
+    private Rigidbody2D _rigidbody2D;
+    private bool _facingRight = true;
+    private bool _grounded;    
+    private float groundRadius = 0.2f;
 
-    bool grounded = false;
-    public Transform groundCheck;
-    float groundRadius = 0.2f;
-    public LayerMask whatIsGround;
-    public float jumpForce = 10f;
+    private BoxCollider2D _boxCollider2D;
+    private CircleCollider2D _circleCollider2D;
 
 	// Use this for initialization
 	void Start ()
 	{
-	    marioAnimator = GetComponent<Animator>();
-	    rigidbody2D = GetComponent<Rigidbody2D>();
-	    coins = 0;
+	    _marioAnimator = GetComponent<Animator>();
+	    _rigidbody2D = GetComponent<Rigidbody2D>();
+	    _circleCollider2D = GetComponent<CircleCollider2D>();
+	    _boxCollider2D = GetComponent<BoxCollider2D>();
 	}
-
-    private void OnDisable()
-    {
-        GameManager.instance.playerCoins = coins;
-    }
 	
 	// Update is called once per frame
 	void FixedUpdate ()
 	{
-	    grounded = Physics2D.OverlapCircle(groundCheck.position, groundRadius, whatIsGround);
-        marioAnimator.SetBool("Ground", grounded);
-        marioAnimator.SetFloat("vSpeed", rigidbody2D.velocity.y);
+	    _grounded = Physics2D.OverlapCircle(GroundCheck.position, groundRadius, WhatIsGround);
+        _marioAnimator.SetBool("Ground", _grounded);
 
 	    float move = Input.GetAxis("Horizontal");
 
-        marioAnimator.SetFloat("Speed", Mathf.Abs(move));
+        _marioAnimator.SetFloat("Speed", Mathf.Abs(move));
 
-        rigidbody2D.velocity = new Vector2(move * maxSpeed, rigidbody2D.velocity.y);
+        _rigidbody2D.velocity = new Vector2(move * MaxSpeed, _rigidbody2D.velocity.y);
 
-	    if (move > 0 && !facingRight)
+	    if (move > 0 && !_facingRight)
 	    {
 	        Flip();
 	    }
 
-        else if (move < 0 && facingRight)
+        else if (move < 0 && _facingRight)
         {
             Flip();
         }
@@ -54,28 +50,28 @@ public class Mario : MonoBehaviour
 
     void Update()
     {
-        if (grounded && Input.GetKeyDown(KeyCode.Space))
+        if (_grounded && Input.GetKeyDown(KeyCode.Space))
         {
-            marioAnimator.SetBool("Ground", false);
-            rigidbody2D.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            _marioAnimator.SetBool("Ground", false);
+            _rigidbody2D.AddForce(Vector2.up * JumpForce, ForceMode2D.Impulse);
         }
     }
 
     void Flip()
     {
-        facingRight = !facingRight;
+        _facingRight = !_facingRight;
         Vector3 theScale = transform.localScale;
         theScale.x *= -1;
         transform.localScale = theScale;
     }
 
-    void OnCollisionEnter2D(Collision2D other)
-    {
-        if(other.gameObject.tag == "BreakingBlock")
-        {
-            Destroy(other.gameObject);
-        }       
-    }
+    //void OnCollisionEnter2D(Collision2D other)
+    //{
+    //    if(other.gameObject.tag == "BreakingBlock")
+    //    {
+    //        Destroy(other.gameObject);
+    //    }       
+    //}
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -94,5 +90,35 @@ public class Mario : MonoBehaviour
         //    food += pointsPerSoda;
         //    other.gameObject.SetActive(false);
         //}
+    }
+
+    private void Dead()
+    {
+        _marioAnimator.SetBool("Dead", true);
+        gameObject.SetActive(false);
+        Destroy(this, 5f);
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        Collider2D collider = collision.collider;
+
+        if (collider.tag == "Enemy")
+        {
+            Vector3 contactPoint = collision.contacts[0].point;
+            Vector3 center = collider.bounds.center;
+
+            bool top = contactPoint.y > center.y;
+
+            if (top)
+            {
+                collider.gameObject.SetActive(false);
+            }
+
+            else
+            {
+                Dead();
+            }
+        }
     }
 }

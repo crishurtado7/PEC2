@@ -2,13 +2,12 @@
 
 public class MarioFollower : MonoBehaviour
 {
-    public Transform player;
-    private int distance = 3;
+    public Transform Player;
+    private const int YPosition = -7;
 
     void Update()
     {
-        var position = new Vector3(player.position.x, -7, -10);
-        transform.position = position;
+        transform.position = new Vector3(Player.position.x, YPosition, -10);
     }
 
 }

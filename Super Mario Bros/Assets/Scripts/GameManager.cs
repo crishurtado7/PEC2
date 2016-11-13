@@ -7,6 +7,9 @@ public class GameManager : MonoBehaviour
 
     private int level = 3;
     public int playerCoins;
+    public AudioClip DeathSound;
+
+    private AudioSource _audioSource;
 
     void Awake()
     {
@@ -17,6 +20,7 @@ public class GameManager : MonoBehaviour
         }
         DontDestroyOnLoad(gameObject);
         boardScript = GetComponent<BoardManager>();
+        _audioSource = GetComponent<AudioSource>();
         InitGame();
     }
 
@@ -29,5 +33,11 @@ public class GameManager : MonoBehaviour
     void Update()
     {
 
+    }
+
+    internal void GameOver()
+    {
+        _audioSource.clip = DeathSound;
+        _audioSource.Play();
     }
 }

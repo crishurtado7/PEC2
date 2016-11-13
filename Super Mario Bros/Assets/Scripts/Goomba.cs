@@ -2,36 +2,46 @@
 
 public class Goomba : MonoBehaviour
 {
-    public float MaxSpeed = 7f;   
+    public float MaxSpeed = 7f;
     public float MinimumDistanceWithPlayer = 10;
 
     private Animator _goombaAnimator;
     private Rigidbody2D _rigidbody2D;
     private int _move = -1;
-    private GameObject _player;
+    private GameObject _player;   
+    private bool _isDead;
+
+    private CircleCollider2D _circleCollider2D;
 
     void Start()
     {
+        _isDead = false;
         _goombaAnimator = GetComponent<Animator>();
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _player = GameObject.FindGameObjectWithTag("Player");
         _goombaAnimator.SetBool("Active", false);
+        _circleCollider2D = GetComponent<CircleCollider2D>();
     }
 
-    private void OnDisable()
+    public void Dead()
     {
+        _isDead = true;
+        _circleCollider2D.enabled = false;
         _goombaAnimator.SetBool("Dead", true);
-        Destroy(this, 5f);
+        Destroy(gameObject, 0.5f);
     }
 
     void FixedUpdate()
     {
-        var playerDistance = CalculateDistanceWithPlayer();
-
-        if (playerDistance <= MinimumDistanceWithPlayer)
+        if (!_isDead)
         {
-            _goombaAnimator.SetBool("Active", true);
-            _rigidbody2D.velocity = new Vector2(_move * MaxSpeed, _rigidbody2D.velocity.y);
+            var playerDistance = CalculateDistanceWithPlayer();
+
+            if (playerDistance <= MinimumDistanceWithPlayer)
+            {
+                _goombaAnimator.SetBool("Active", true);
+                _rigidbody2D.velocity = new Vector2(_move * MaxSpeed, _rigidbody2D.velocity.y);
+            }
         }
     }
 

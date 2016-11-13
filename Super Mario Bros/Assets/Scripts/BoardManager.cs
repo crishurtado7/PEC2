@@ -28,6 +28,8 @@ public class BoardManager : MonoBehaviour
 
     public TilePrefab[] Tiles;
     public GameObject Enemy;
+    public GameObject SuperMushroom;
+    public GameObject Coin;
 
     private Transform _boardHolder;
     private List<Vector3> _gridPositions = new List<Vector3>();
@@ -82,7 +84,6 @@ public class BoardManager : MonoBehaviour
             new Vector3(21, -12, 0),
             new Vector3(40, -12, 0),
             new Vector3(53, -12, 0),
-            new Vector3(54, -12, 0),
             new Vector3(84, -5, 0),
             new Vector3(82, -8, 0),
             new Vector3(101, -12, 0),
@@ -96,10 +97,22 @@ public class BoardManager : MonoBehaviour
         }
     }
 
+    void SetupRewards()
+    {
+        Vector3 itemBlock = new Vector3(16, -9, 0);
+        var toInstantiate = Tiles[11].Tile;
+
+        GameObject instance = Instantiate(toInstantiate, itemBlock, Quaternion.identity) as GameObject;
+
+        instance.transform.SetParent(_boardHolder);
+        Vector3 breakingBlock = new Vector3(20, -9, 0); 
+    }
+
     public void SetupScene(int level)
     {
         BoardSetup();
         SetupEnemies();
+        SetupRewards();
         InitializeList();
     }
 }

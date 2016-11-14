@@ -5,9 +5,9 @@ using UnityEngine;
 public class TilePrefab
 {
     public GameObject Tile;
-    public Tiles TileType;
+    public TileType TileType;
 
-    public TilePrefab(GameObject tilePrefab, Tiles tile)
+    public TilePrefab(GameObject tilePrefab, TileType tile)
     {
         Tile = tilePrefab;
         TileType = tile;

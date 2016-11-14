@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class Mario : MonoBehaviour
 {
@@ -7,6 +8,7 @@ public class Mario : MonoBehaviour
     public float JumpForce = 14f;
     public float MaxSpeed = 7f;
     public AudioClip JumpSound;
+    public AudioClip PowerUpSound;
 
     private Animator _marioAnimator;
     private Rigidbody2D _rigidbody2D;
@@ -14,6 +16,7 @@ public class Mario : MonoBehaviour
     private bool _grounded;    
     private float groundRadius = 0.2f;
     private bool _isDead;
+    private int health;
 
     private BoxCollider2D _boxCollider2D;
     private CircleCollider2D _circleCollider2D;
@@ -25,6 +28,7 @@ public class Mario : MonoBehaviour
 	void Start ()
 	{
         _isDead = false;
+        health = 1;
         _marioAnimator = GetComponent<Animator>();
 	    _rigidbody2D = GetComponent<Rigidbody2D>();
 	    _circleCollider2D = GetComponent<CircleCollider2D>();
@@ -99,11 +103,6 @@ public class Mario : MonoBehaviour
             //Invoke("Restart", restartLevelDelay);
             //enabled = false;
         }
-        else if (other.tag == "SuperMushroom")
-        {
-            //food += pointsPerFood;
-            //other.gameObject.SetActive(false);
-        }
     }
 
     public void Dead()
@@ -130,15 +129,21 @@ public class Mario : MonoBehaviour
         if (collider.tag == "Enemy")
         {
             bool top = contactPoint.y > center.y;
+            health--;
 
             if (top)
             {
                 collider.gameObject.SendMessage("Dead");
             }
 
-            else
+            else if(health == 0)
             {
                 Dead();
+            }
+
+            else if(health > 1)
+            {
+                _marioAnimator.SetBool("Big", false);
             }
         }
 
@@ -150,6 +155,25 @@ public class Mario : MonoBehaviour
         else if(collider.tag == "ItemBlock")
         {
             bool bottom = contactPoint.y < center.y;
+
+            if (bottom)
+            {
+                collider.gameObject.SendMessage("ReturnReward");
+            }
         }
+
+        else if (collider.tag == "SuperMushroom")
+        {
+            PlaySound(PowerUpSound);
+            _marioAnimator.SetBool("Big", true);
+            ResizeComponents();
+            Destroy(collider.gameObject);
+            if (health == 1) health++;
+        }
+    }
+
+    private void ResizeComponents()
+    {
+        _circleCollider2D.offset = new Vector2(_circleCollider2D.offset.x, _circleCollider2D.offset.y - .5f);
     }
 }

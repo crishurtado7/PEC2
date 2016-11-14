@@ -65,6 +65,11 @@ public class BoardManager : MonoBehaviour
 
                         GameObject instance = Instantiate(toInstantiate, new Vector3(x, -y, 0f), Quaternion.identity) as GameObject;
 
+                        if (Tiles[tileId].TileType == TileType.ItemBlock)
+                        {
+                            instance.GetComponent<ItemBlock>().SetupReward(SuperMushroom);
+                        }
+
                         instance.transform.SetParent(_boardHolder);
                     }
                 }
@@ -112,7 +117,6 @@ public class BoardManager : MonoBehaviour
     {
         BoardSetup();
         SetupEnemies();
-        SetupRewards();
         InitializeList();
     }
 }

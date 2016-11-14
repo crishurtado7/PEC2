@@ -1,4 +1,4 @@
-﻿public enum Tiles
+﻿public enum TileType
 {
     Unset,
     Block2,

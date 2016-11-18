@@ -6,9 +6,12 @@ public class ItemBlock : MonoBehaviour
     private Transform _transform;
     private Animator _animator;
 
+    private bool _used;
+
     // Use this for initialization
     void Start()
     {
+        _used = false;
         _transform = GetComponent<Transform>();
         _animator = GetComponent<Animator>();
     }
@@ -26,7 +29,11 @@ public class ItemBlock : MonoBehaviour
 
     public void ReturnReward()
     {
-        _animator.SetBool("Used", true);
-        Instantiate(_reward, new Vector3(transform.position.x, transform.position.y + 1, transform.position.z), Quaternion.identity);
+        if (!_used)
+        {
+            _used = true;
+            _animator.SetBool("Used", true);
+            Instantiate(_reward, new Vector3(_transform.position.x, _transform.position.y + 1, _transform.position.z), Quaternion.identity);
+        }
     }
 }

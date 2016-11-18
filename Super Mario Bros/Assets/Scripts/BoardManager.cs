@@ -26,6 +26,13 @@ public class BoardManager : MonoBehaviour
 {8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,-1,-1,-1,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,-1,-1,-1,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,-1,-1,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8}
    };
 
+    private List<Vector3> _superMushroomPositions = new List<Vector3>
+    {
+        new Vector3(21, -9, 0),
+        new Vector3(81, -9, 0),
+        new Vector3(112, -5, 0)
+    };
+
     public TilePrefab[] Tiles;
     public GameObject Enemy;
     public GameObject SuperMushroom;
@@ -67,7 +74,14 @@ public class BoardManager : MonoBehaviour
 
                         if (Tiles[tileId].TileType == TileType.ItemBlock)
                         {
-                            instance.GetComponent<ItemBlock>().SetupReward(SuperMushroom);
+                            if (_superMushroomPositions.Contains(instance.transform.position))
+                            {
+                                instance.GetComponent<ItemBlock>().SetupReward(SuperMushroom);
+                            }
+                            else
+                            {
+                                instance.GetComponent<ItemBlock>().SetupReward(Coin);
+                            }
                         }
 
                         instance.transform.SetParent(_boardHolder);
@@ -100,17 +114,6 @@ public class BoardManager : MonoBehaviour
         {
             Instantiate(Enemy, enemiesPositions.ElementAt(i), Quaternion.identity);
         }
-    }
-
-    void SetupRewards()
-    {
-        Vector3 itemBlock = new Vector3(16, -9, 0);
-        var toInstantiate = Tiles[11].Tile;
-
-        GameObject instance = Instantiate(toInstantiate, itemBlock, Quaternion.identity) as GameObject;
-
-        instance.transform.SetParent(_boardHolder);
-        Vector3 breakingBlock = new Vector3(20, -9, 0); 
     }
 
     public void SetupScene(int level)

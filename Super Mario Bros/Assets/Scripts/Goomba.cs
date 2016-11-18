@@ -10,12 +10,14 @@ public class Goomba : MonoBehaviour
     private int _move = -1;
     private GameObject _player;   
     private bool _isDead;
+    private bool _isActive;
 
     private CircleCollider2D _circleCollider2D;
 
     void Start()
     {
         _isDead = false;
+        _isActive = false;
         _goombaAnimator = GetComponent<Animator>();
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _player = GameObject.FindGameObjectWithTag("Player");
@@ -35,11 +37,18 @@ public class Goomba : MonoBehaviour
     {
         if (!_isDead)
         {
-            var playerDistance = CalculateDistanceWithPlayer();
-
-            if (playerDistance <= MinimumDistanceWithPlayer)
+            if (!_isActive)
             {
-                _goombaAnimator.SetBool("Active", true);
+                var playerDistance = CalculateDistanceWithPlayer();
+
+                if (playerDistance <= MinimumDistanceWithPlayer)
+                {
+                    _isActive = true;
+                    _goombaAnimator.SetBool("Active", true);
+                }
+            }
+            if (_isActive)
+            {
                 _rigidbody2D.velocity = new Vector2(_move * MaxSpeed, _rigidbody2D.velocity.y);
             }
         }

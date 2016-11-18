@@ -5,7 +5,7 @@ public class Mario : MonoBehaviour
 {
     public Transform GroundCheck;
     public LayerMask WhatIsGround;
-    public float JumpForce = 14f;
+    public float JumpForce = 16f;
     public float MaxSpeed = 7f;
     public AudioClip JumpSound;
     public AudioClip PowerUpSound;
@@ -16,7 +16,8 @@ public class Mario : MonoBehaviour
     private bool _grounded;    
     private float groundRadius = 0.2f;
     private bool _isDead;
-    private int health;
+    private int _health;
+    private bool _isBig;
 
     private BoxCollider2D _boxCollider2D;
     private CircleCollider2D _circleCollider2D;
@@ -28,7 +29,8 @@ public class Mario : MonoBehaviour
 	void Start ()
 	{
         _isDead = false;
-        health = 1;
+        _health = 1;
+	    _isBig = false;
         _marioAnimator = GetComponent<Animator>();
 	    _rigidbody2D = GetComponent<Rigidbody2D>();
 	    _circleCollider2D = GetComponent<CircleCollider2D>();
@@ -129,27 +131,34 @@ public class Mario : MonoBehaviour
         if (collider.tag == "Enemy")
         {
             bool top = contactPoint.y > center.y;
-            health--;
+            _health--;
 
             if (top)
             {
                 collider.gameObject.SendMessage("Dead");
             }
 
-            else if(health == 0)
+            else if(_health == 0)
             {
                 Dead();
             }
 
-            else if(health > 1)
+            else if(_isBig)
             {
+                _isBig = false;
                 _marioAnimator.SetBool("Big", false);
+                ResizeComponents(false);
             }
         }
 
         else if(collider.tag == "BreakingBlock")
         {
             bool bottom = contactPoint.y < center.y;
+
+            if (bottom && _isBig)
+            {
+                Destroy(collider.gameObject);
+            }
         }
 
         else if(collider.tag == "ItemBlock")
@@ -164,16 +173,24 @@ public class Mario : MonoBehaviour
 
         else if (collider.tag == "SuperMushroom")
         {
+            if (!_isBig)
+            {
+                _isBig = true;
+                ++_health;            
+                _marioAnimator.SetBool("Big", true);
+                ResizeComponents(true);
+            }
             PlaySound(PowerUpSound);
-            _marioAnimator.SetBool("Big", true);
-            ResizeComponents();
             Destroy(collider.gameObject);
-            if (health == 1) health++;
         }
     }
 
-    private void ResizeComponents()
+    private void ResizeComponents(bool toUpper)
     {
-        _circleCollider2D.offset = new Vector2(_circleCollider2D.offset.x, _circleCollider2D.offset.y - .5f);
+        var size = toUpper ? 1 : -1;
+        GetComponent<Transform>().position = new Vector3(GetComponent<Transform>().position.x, GetComponent<Transform>().position.y + size * .5f, GetComponent<Transform>().position.z);
+        _boxCollider2D.size = new Vector2(_boxCollider2D.size.x + size * .2f, _boxCollider2D.size.y + size * 1f);
+        _circleCollider2D.offset = new Vector2(_circleCollider2D.offset.x, _circleCollider2D.offset.y - size * .5f);
+        GroundCheck.position = new Vector3(GroundCheck.position.x, GroundCheck.position.y - size * .5f, GroundCheck.position.z);
     }
 }
